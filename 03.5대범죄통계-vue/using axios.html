@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+                 
+<body>
+    <html>
+
+    <head>
+    </head>
+
+    <body>
+        <div id="columnchart_material" style="width: 1900px; height: 2900px"></div>
+        <!--3번-->
+        <!--4번 원래는 alert(1)-->
+        <button onclick="drawChartOne()">get 방식으로 차트 그리기</button>
+        <button onclick="drawCharttwo()">post 방식으로 차트 그리기</button>
+
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <!--2번-->
+        <script type="text/javascript">
+            /* get 방식으로 axios로 비동기 요청, 응답
+            1. axios.post("server").then(resData => {}).catch(error => {});
+            */
+
+            function drawChartOne() {
+                axios.get("http://localhost/crimeProject/crimeList.jsp")
+                    .then(resData => {
+                        console.log(resData);
+                        var test;
+                        var key;
+                        var value;
+                        const dataArray = Array(27).fill(null).map(() => Array());
+                       // console.log(typeof (dataArray));
+                        //console.log(dataArray);
+                        for (var i = 0; i < Object.keys.length; i++) {
+                            test = resData.data[i];
+                            key = Object.keys(test);
+                            dataArray[i] = key;
+                        }
+                        for (var i = 0; i < resData.data.length; i++) {
+                            test = resData.data[i];
+                            value = Object.values(test);
+                            dataArray[i + 1] = value;
+                        }
+                        console.log(test);
+                        console.log(key);
+                        console.log(value);
+                        console.log(dataArray);
+                        drawChart(dataArray);
+                    })
+                    .catch(function (error) {
+                        console.log("안되안돼", error);
+                    });
+            }
+
+            //post 방식으로 비동기
+            // function drawCharttwo() {
+            //     axios.post("http://localhost/step02_axiosResponse/axiosPost.jsp")
+            //         .then(resData => {
+            //             var bowl;
+            //             var key;
+            //             var value;
+            //             const dataArray = Array(5).fill(null).map(() => Array());
+            //             for (var i = 0; i < Object.keys.length; i++) {
+            //                 bowl = resData.data[i];
+            //                 key = Object.keys(bowl);
+            //                 dataArray[i] = key;
+            //             }
+            //             for (var i = 0; i < resData.data.length; i++) {
+            //                 bowl = resData.data[i];
+            //                 value = Object.values(bowl);
+            //                 dataArray[i + 1] = value;
+            //                 console.log(dataArray);
+            //             }
+            //             drawChart(dataArray);
+            //         })
+            //         .catch(function (error) {
+            //             console.log("안되안돼", error);
+            //         });
+            // }
+
+            google.charts.load('current', { 'packages': ['bar'] });
+            //즉시실행         //파라미터
+            function drawChart(dataArray) {
+                var data = google.visualization.arrayToDataTable(dataArray);
+                //파라미터
+                var options = {
+                    title: '서울시 5대 범죄 비율',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+                };
+                var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+                chart.draw(data, options);
+            }
+        </script>
+    </body>
+
+    </html>
+</body>
+
+</html>
+
+
+<!--
+    1. 로직 : 이미 존재하는 library 들 편집
+    2.구조 
+        응답해주는 jsp server
+            -?
+        요청 담당하는 html server
+        = chart의 데이터 포멧은 js 배열
+    3. 개발 설계 
+        1단계 - 서버에서 응답하는 데이터 차트가 그려지나 확인?
+            chart의 데이터 포맷 변경 없이 데이터 제공하는 위치만 변경
+            정상 - 서버에서 응답가능
+                1. 배열 형태 그대로 응답
+                    - js에서 배열 객체로 변환해서 차트에서 반영
+                2. json형태로 응답 시도
+                    - js의 배열로 재가공
+            비정상 - 불가능한 상황이 아닌 실력 문제 야기
+        2단계 - 개발 완료
+    4. 개발 코드 
+        1. 요청 방식 - post
+        2. js - 즉시 실행 함수
+        3. 응답 포맷의 다양성
+            1. json, csv(comma seperated value), text
+
+    5. step10의 의도
+        1. key 조차도 서버에서 응답하는 데이터의 일부로 제시
+            - 이 key에 해당하는 데이터는 java script상에서 동적 처리가 가능하게 개발 권장
+                : 검색 키워드 json key 반환? 획득?
+
+1. let dataArray 만들고
+2. div 밑으로 옮기고
+-->
